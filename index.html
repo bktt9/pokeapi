@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pokédex — PokeAPI (HTML + CSS + JS)</title>
+
+
+  <!-- Archivo de estilos principal -->
+  <link rel="stylesheet" href="./styles.css" />
+
+  <!-- Buenas prácticas de SEO/Compartir (opcional, pero útil) -->
+  <meta name="description" content="Pokédex didáctica con datos en vivo desde PokeAPI: nombre, foto, tipos, habilidades y stats. Hecha con HTML, CSS y JavaScript vanilla." />
+  <meta property="og:title" content="Pokédex — PokeAPI (HTML + CSS + JS)" />
+  <meta property="og:description" content="Pokédex didáctica conectada a PokeAPI. Aprende a consumir APIs con JavaScript." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#ef5350" />
+</head>
+<body>
+  <!-- Mensaje para usuarios sin JS (accesibilidad y UX) -->
+  <noscript>
+    <p style="padding:1rem; background:#ffe9e9; color:#a40000; text-align:center;">
+      Esta página necesita JavaScript para cargar los Pokémon desde PokeAPI. Activa JS y recarga.
+    </p>
+  </noscript>
+
+  <!--
+    Header: título y créditos. Siempre da crédito a PokeAPI ✨
+  -->
+  <header class="site-header">
+    <div class="container">
+      <h1>Pokédex</h1>
+      <p class="subtitle">Datos en vivo desde <a href="https://pokeapi.co/" target="_blank" rel="noopener noreferrer">PokeAPI</a></p>
+    </div>
+  </header>
+
+  <!--
+    Controles: buscador y filtro por tipo.
+    El <form> no hará submit tradicional; JS interceptará el evento.
+  -->
+  <section class="controls">
+    <div class="container">
+      <form id="controlsForm" autocomplete="off" aria-label="Controles de búsqueda y filtros">
+        <div class="control-row">
+          <!-- Buscador por nombre o ID -->
+          <label for="q" class="sr-only">Buscar</label>
+          <input
+            id="q"
+            name="q"
+            type="search"
+            placeholder="Buscar por nombre o ID… (p. ej. pikachu o 25)"
+            inputmode="search"
+            aria-describedby="hint-search"
+          />
+          <small id="hint-search" class="hint">Tip: escribe y presiona Enter, o deja vacío para ver más.</small>
+
+          <!-- Filtro por tipo (agua, fuego, planta, etc.) -->
+          <label for="typeFilter" class="sr-only">Filtrar por tipo</label>
+          <select id="typeFilter" name="type">
+            <!--
+              Este <select> lo rellenaremos dinámicamente desde PokeAPI (lista de tipos).
+              Dejamos una opción por defecto para "todos".
+            -->
+            <option value="">Todos los tipos</option>
+          </select>
+
+          <!-- Orden opcional (por nombre, ID) — lo cargaremos en JS -->
+          <label for="sortBy" class="sr-only">Ordenar por</label>
+          <select id="sortBy" name="sort">
+            <option value="id-asc">ID ↑</option>
+            <option value="id-desc">ID ↓</option>
+            <option value="name-asc">Nombre A→Z</option>
+            <option value="name-desc">Nombre Z→A</option>
+          </select>
+
+          <!-- Botón aplicar filtros/búsqueda -->
+          <button id="applyBtn" type="submit" class="btn">Aplicar</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!--
+    Grid de tarjetas:
+    - JS inyectará aquí las tarjetas de Pokémon con la plantilla <template>.
+    - aria-live=polite para avisar a lectores de pantalla que el contenido cambia.
+  -->
+  <main class="container">
+    <section id="results" class="cards-grid" aria-live="polite" aria-busy="false">
+      <!-- Tarjetas generadas por JS aparecerán aquí -->
+    </section>
+
+    <!-- Botón para carga incremental (por si no usas infinite scroll) -->
+    <div class="load-more-wrap">
+      <button id="loadMore" class="btn btn-secondary" hidden>Cargar más</button>
+    </div>
+  </main>
+
+  <!--
+    Plantilla de una tarjeta de Pokémon:
+    - <template> no se renderiza por sí mismo; JS lo clona y rellena.
+    - Mantiene el HTML limpio y DRY (No te repites)
+  -->
+  <template id="pokemon-card-template">
+    <article class="card" tabindex="0">
+      <!-- Imagen oficial (sprites de PokeAPI). Alt se rellena en JS. -->
+      <div class="card-media">
+        <img class="card-img" src="" alt="" loading="lazy" width="200" height="200" />
+      </div>
+
+      <!-- Contenido textual -->
+      <div class="card-body">
+        <header class="card-header">
+          <h2 class="pokemon-name"></h2>
+          <span class="pokemon-id"></span>
+        </header>
+
+        <div class="pokemon-meta">
+          <div class="types">
+            <!-- Chips de tipos (agua, fuego, etc.) -->
+          </div>
+          <div class="abilities">
+            <strong>Habilidades:</strong>
+            <ul class="ability-list"></ul>
+          </div>
+        </div>
+
+        <details class="stats">
+          <summary>Stats base</summary>
+          <ul class="stats-list">
+            <!-- HP, ATK, DEF, etc. -->
+          </ul>
+        </details>
+      </div>
+    </article>
+  </template>
+
+  <!--
+    Plantilla de tarjeta "skeleton" para mostrar mientras cargan datos (mejor UX).
+    Se usa como placeholder y se reemplaza al llegar la respuesta de la API.
+  -->
+  <template id="pokemon-card-skeleton">
+    <article class="card skeleton" aria-hidden="true">
+      <div class="card-media">
+        <div class="sk-img"></div>
+      </div>
+      <div class="card-body">
+        <div class="sk-line sk-title"></div>
+        <div class="sk-line sk-id"></div>
+        <div class="sk-chip-row"></div>
+        <div class="sk-line sk-subtitle"></div>
+        <div class="sk-list">
+          <div class="sk-line"></div>
+          <div class="sk-line"></div>
+          <div class="sk-line"></div>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <!--
+    Footer con créditos y aviso de límites:
+    PokeAPI tiene rate limit. Nosotros haremos peticiones responsables desde JS
+    (paginando y sin spam).
+  -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>Hecho con  <a href="https://pokeapi.co/" target="_blank" rel="noopener noreferrer">PokeAPI</a>. Esta es una app educativa (HTML + CSS + JS).</p>
+    </div>
+  </footer>
+
+  <!--
+    Importante: el script va con defer para que el HTML cargue primero.
+    En app.js haremos:
+      1) fetch() a https://pokeapi.co/api/v2/ para tipos y lista de Pokémon
+      2) render de tarjetas usando las plantillas
+      3) buscador, filtros y carga incremental
+  -->
+  <script src="./app.js" defer></script>
+</body>
+</html>

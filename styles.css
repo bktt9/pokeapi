@@ -1,0 +1,465 @@
+/* ==========================================================================
+    Tema base y resets
+   - Variables de color
+   - Reset suave y tipografía
+   - Soporte light/dark automático
+   ========================================================================== */
+
+:root{
+  /* Colores base (modo claro) */
+  --bg: #fafafa;
+  --panel: #ffffff;
+  --panel-2: #f4f6f8;
+  --txt: #1b1f24;
+  --muted: #6b7280;
+  --accent: #ef5350;       /* Rojo Poké */
+  --accent-2: #ffd54f;     /* Amarillo */
+  --ring: rgba(239, 83, 80, 0.45);
+
+  /* Tarjeta / UI */
+  --radius: 14px;
+  --shadow: 0 6px 20px rgba(27, 31, 36, 0.08);
+
+  /* Skeleton */
+  --sk1: #e9eef3;
+  --sk2: #dfe6ed;
+
+  /*  por tipo (PokeAPI types) */
+  --t-normal:   #a8a77a;
+  --t-fire:     #ee8130;
+  --t-water:    #6390f0;
+  --t-electric: #f7d02c;
+  --t-grass:    #7ac74c;
+  --t-ice:      #96d9d6;
+  --t-fighting: #c22e28;
+  --t-poison:   #a33ea1;
+  --t-ground:   #e2bf65;
+  --t-flying:   #a98ff3;
+  --t-psychic:  #f95587;
+  --t-bug:      #a6b91a;
+  --t-rock:     #b6a136;
+  --t-ghost:    #735797;
+  --t-dragon:   #6f35fc;
+  --t-dark:     #705746;
+  --t-steel:    #b7b7ce;
+  --t-fairy:    #d685ad;
+}
+
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0b0f1a;
+    --panel:#101425;
+    --panel-2:#0d1120;
+    --txt:#e8ecff;
+    --muted:#9aa3c7;
+    --shadow: 0 10px 30px rgba(0,0,0,0.35);
+
+    --sk1:#162034;
+    --sk2:#1a2944;
+    --ring: rgba(255, 213, 79, 0.35);
+  }
+}
+
+*,
+*::before,
+*::after{ box-sizing: border-box; }
+
+html{
+  color-scheme: light dark;
+  -webkit-text-size-adjust: 100%;
+}
+
+body{
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  background: var(--bg);
+  color: var(--txt);
+  line-height: 1.45;
+}
+
+img{ display:block; max-width:100%; height:auto; }
+a{ color: var(--accent); text-decoration: none; }
+a:hover{ text-decoration: underline; }
+
+.container{
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Utilidad para textos solo para lectores de pantalla */
+.sr-only{
+  position:absolute !important;
+  width:1px; height:1px;
+  padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0);
+  white-space:nowrap; border:0;
+}
+
+/* ==========================================================================
+    Header y Footer
+   ========================================================================== */
+
+.site-header{
+  position: sticky;
+  top:0;
+  z-index: 10;
+  background: linear-gradient(180deg, var(--panel), transparent);
+  backdrop-filter: saturate(1.2) blur(6px);
+  border-bottom: 1px solid rgba(127,127,127,0.15);
+}
+
+.site-header .container{
+  display:flex; align-items:center; justify-content:space-between;
+  gap: 1rem;
+  padding: 1rem 1rem;
+}
+
+.site-header h1{
+  margin:0;
+  font-size: clamp(1.4rem, 2.2vw, 2rem);
+  letter-spacing: .3px;
+}
+
+.subtitle{
+  margin:0;
+  color: var(--muted);
+  font-size:.95rem;
+}
+
+.site-footer{
+  margin-top: 3rem;
+  padding: 2rem 0;
+  border-top: 1px dashed rgba(127,127,127,0.25);
+  background: linear-gradient(0deg, var(--panel-2), transparent);
+}
+
+.site-footer p{
+  margin:0; text-align:center; color: var(--muted);
+}
+
+/* ==========================================================================
+    Controles (buscador, filtros, orden)
+   ========================================================================== */
+
+.controls{
+  position: sticky;
+  top: 58px; /* debajo del header */
+  z-index: 5;
+  background: linear-gradient(180deg, var(--panel), transparent);
+  padding: .6rem 0 1rem;
+}
+
+.control-row{
+  display:grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: .75rem;
+  align-items: center;
+}
+
+#q{
+  grid-column: span 6;
+  min-width: 0; /* para evitar overflow */
+}
+
+#typeFilter{
+  grid-column: span 3;
+}
+
+#sortBy{
+  grid-column: span 2;
+}
+
+#applyBtn{
+  grid-column: span 1;
+}
+
+@media (max-width: 840px){
+  #q{ grid-column: span 12; }
+  #typeFilter{ grid-column: span 6; }
+  #sortBy{ grid-column: span 6; }
+  #applyBtn{ grid-column: span 12; }
+}
+
+.hint{
+  display:block;
+  margin-top:.25rem;
+  color: var(--muted);
+  font-size: .85rem;
+}
+
+/* Inputs y selects coherentes */
+input[type="search"],
+select{
+  width:100%;
+  height: 42px;
+  padding: 0 .9rem;
+  border: 1px solid rgba(127,127,127,0.25);
+  border-radius: 10px;
+  background: var(--panel);
+  color: var(--txt);
+  outline: none;
+  transition: box-shadow .2s ease, border-color .2s ease, background .2s ease;
+}
+
+input[type="search"]{
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="search"]::placeholder{
+  color: var(--muted);
+}
+
+input[type="search"]:focus,
+select:focus{
+  border-color: transparent;
+  box-shadow: 0 0 0 3px var(--ring);
+  background: linear-gradient(0deg, var(--panel), var(--panel-2));
+}
+
+/* Botones */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  gap:.5rem;
+  height: 42px; padding: 0 1rem;
+  border-radius:10px; border: none;
+  background: linear-gradient(180deg, var(--accent), #d94e4c);
+  color: white; font-weight: 700; letter-spacing:.2px;
+  cursor:pointer; box-shadow: var(--shadow);
+  transition: transform .08s ease, filter .2s ease, opacity .2s ease;
+}
+
+.btn:hover{ filter: brightness(1.05); }
+.btn:active{ transform: translateY(1px) scale(.99); }
+
+.btn[disabled]{ opacity:.6; cursor:not-allowed; }
+
+.btn-secondary{
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  color: var(--txt);
+  border: 1px solid rgba(127,127,127,0.25);
+}
+
+/* ==========================================================================
+   🧩 Grid de tarjetas
+   ========================================================================== */
+
+.cards-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  padding: 1rem 0 0;
+}
+
+/* Contenedor del botón "cargar más" */
+.load-more-wrap{
+  display:flex; justify-content:center;
+  padding: 1.25rem 0 2rem;
+}
+
+/* ==========================================================================
+   Tarjeta de Pokémon
+   - imagen
+   - encabezado con nombre + ID
+   - chips de tipos
+   - habilidades
+   - stats (details/summary)
+   ========================================================================== */
+
+.card{
+  background: linear-gradient(180deg, var(--panel), var(--panel-2));
+  border: 1px solid rgba(127,127,127,0.20);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: clip;
+  transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease;
+  outline: none;
+}
+
+.card:focus-within,
+.card:hover{
+  transform: translateY(-2px);
+  border-color: transparent;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.12);
+}
+
+.card-media{
+  background: radial-gradient(120px 60px at 50% 40%, rgba(255,255,255,.35), transparent),
+              linear-gradient(180deg, rgba(255,255,255,.06), transparent);
+  display:flex; align-items:center; justify-content:center;
+  padding: .75rem .75rem 0;
+  min-height: 160px;
+}
+
+.card-img{
+  width: 200px; height: 200px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.15));
+}
+
+.card-body{
+  padding: .85rem .9rem 1rem;
+}
+
+.card-header{
+  display:flex; align-items:baseline; justify-content:space-between;
+  gap:.5rem; margin-bottom:.35rem;
+}
+
+.pokemon-name{
+  margin:0; font-size: 1.1rem; font-weight: 800; letter-spacing:.2px;
+  text-transform: capitalize;
+}
+
+.pokemon-id{
+  font-variant-numeric: tabular-nums;
+  font-weight: 700; color: var(--muted);
+  background: rgba(127,127,127,0.15);
+  border-radius: 999px;
+  padding: .15rem .5rem;
+}
+
+/* Chips de tipos */
+.types{
+  display:flex; gap:.35rem; flex-wrap: wrap;
+  margin: .35rem 0 .5rem;
+}
+
+.type-chip{
+  --bg: #e0e0e0;
+  display:inline-flex; align-items:center; justify-content:center;
+  height: 26px; padding: 0 .6rem;
+  border-radius: 999px;
+  background: var(--bg);
+  color: #0b0f1a;
+  font-size:.85rem; font-weight: 800; letter-spacing:.2px;
+  text-transform: capitalize;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+/* Modificadores por tipo (JS añadirá las clases) */
+.type-chip--normal{   --bg: var(--t-normal); }
+.type-chip--fire{     --bg: var(--t-fire); }
+.type-chip--water{    --bg: var(--t-water); }
+.type-chip--electric{ --bg: var(--t-electric); }
+.type-chip--grass{    --bg: var(--t-grass); }
+.type-chip--ice{      --bg: var(--t-ice); }
+.type-chip--fighting{ --bg: var(--t-fighting); color:#fff; }
+.type-chip--poison{   --bg: var(--t-poison); color:#fff; }
+.type-chip--ground{   --bg: var(--t-ground); }
+.type-chip--flying{   --bg: var(--t-flying); }
+.type-chip--psychic{  --bg: var(--t-psychic); }
+.type-chip--bug{      --bg: var(--t-bug); }
+.type-chip--rock{     --bg: var(--t-rock); }
+.type-chip--ghost{    --bg: var(--t-ghost); color:#fff; }
+.type-chip--dragon{   --bg: var(--t-dragon); color:#fff; }
+.type-chip--dark{     --bg: var(--t-dark); color:#fff; }
+.type-chip--steel{    --bg: var(--t-steel); }
+.type-chip--fairy{    --bg: var(--t-fairy); }
+
+/* Habilidades */
+.abilities{
+  margin: .25rem 0 .5rem;
+  color: var(--txt);
+}
+
+.ability-list{
+  display:flex; gap:.35rem; flex-wrap: wrap;
+  padding: 0; margin:.25rem 0 0;
+  list-style:none;
+}
+
+.ability-list li{
+  padding:.2rem .5rem;
+  border-radius: 8px;
+  background: rgba(127,127,127,0.15);
+  color: var(--txt);
+  font-size:.85rem;
+  text-transform: capitalize;
+}
+
+/* Stats */
+.stats{
+  margin-top:.35rem;
+  background: linear-gradient(180deg, transparent, rgba(127,127,127,0.08));
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.stats > summary{
+  cursor:pointer;
+  list-style:none; /* Safari */
+  padding: .5rem .6rem;
+  font-weight: 800;
+  user-select: none;
+}
+
+.stats > summary::-webkit-details-marker{ display:none; }
+
+.stats[open] > summary{
+  background: rgba(127,127,127,0.12);
+}
+
+.stats-list{
+  display:grid; grid-template-columns: 1fr 1fr;
+  gap: .4rem .6rem;
+  padding: .6rem;
+  margin:0; list-style:none;
+}
+
+@media (max-width: 480px){
+  .stats-list{ grid-template-columns: 1fr; }
+}
+
+.stats-list li{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:.6rem;
+  padding:.35rem .5rem;
+  background: linear-gradient(180deg, var(--panel), var(--panel-2));
+  border: 1px solid rgba(127,127,127,0.20);
+  border-radius: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+    Skeleton loading (placeholders)
+   ========================================================================== */
+
+.skeleton{
+  position:relative;
+  overflow:hidden;
+}
+
+.sk-img,
+.sk-line,
+.sk-chip-row{
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--sk1), var(--sk2), var(--sk1));
+  background-size: 200% 100%;
+  animation: sk-shimmer 1.2s infinite;
+}
+
+.sk-img{
+  width: 200px; height: 200px; margin: .75rem auto 0;
+}
+
+.sk-line{
+  height: 14px; margin: .5rem .9rem;
+}
+
+.sk-title{ height: 18px; width: 60%; }
+.sk-id{ width: 30%; }
+
+.sk-chip-row{
+  height: 26px; margin: .5rem .9rem; width: 70%;
+}
+
+.sk-list{
+  display:grid; gap:.4rem; padding: .4rem .9rem 1rem;
+}
+
+@keyframes sk-shimmer{
+  0%{ background-position: 200% 0; }
+  100%{ background-position: -200% 0; }
+}
